@@ -1,0 +1,4 @@
+elasticsearch==5.0.1
+elasticsearch-dsl==5.0.0
+transitions==0.4.3
+voicelabs==0.0.10

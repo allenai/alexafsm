@@ -1,0 +1,25 @@
+{
+    "intents": [
+        {
+            "intent": "NewSearch",
+            "slots": [
+                {
+                    "name": "Query",
+                    "type": "QUERY"
+                }
+            ]
+        },
+        {
+            "intent": "AMAZON.YesIntent"
+        },
+        {
+            "intent": "AMAZON.NoIntent"
+        },
+        {
+            "intent": "AMAZON.StopIntent"
+        },
+        {
+            "intent": "AMAZON.CancelIntent"
+        }
+    ]
+}
