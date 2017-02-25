@@ -1,7 +1,7 @@
 {
     "intents": [
         {
-            "intent": "NewSearch",
+            "intent": "Search",
             "slots": [
                 {
                     "name": "Query",
