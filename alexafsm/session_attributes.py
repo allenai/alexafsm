@@ -1,13 +1,9 @@
-"""
-Session attributes that keep track of the state of a conversation
-"""
-
 INITIAL_STATE = 'initial'
 
 
 class SessionAttributes:
     """
-    Base class for all session attributes
+    Base class for all session attributes that keep track of the state of conversation
     """
 
     # "Abstract" class properties to be overwritten/set in inherited classes

@@ -1,6 +1,3 @@
-"""
-Base class for States
-"""
 import inspect
 
 from alexafsm.session_attributes import SessionAttributes, INITIAL_STATE
@@ -37,8 +34,8 @@ def with_transitions(*transitions):
 
 class States:
     """
-    A collection of static methods that generate responses based on the current session attributes.
-    Each method corresponds to a state of the FSM.
+    A collection of static methods that generate responses based on the current session attributes
+    Each method corresponds to a state of the FSM
     """
 
     # "Abstract" class property to be overwritten/set in inherited classes.
@@ -60,7 +57,7 @@ class States:
     @classmethod
     def get_states_transitions(cls):
         """
-        Get all states & transitions specified in the states via with_transitions decoration.
+        Get all states & transitions specified in the states via with_transitions decoration
         """
         states = []
         transitions = []

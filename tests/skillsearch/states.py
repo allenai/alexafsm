@@ -1,6 +1,3 @@
-"""
-States implementation for skill search
-"""
 from alexafsm import response, amazon_intent
 from alexafsm.states import States as IStates, with_transitions
 from tests.skillsearch.session_attributes import SessionAttributes
@@ -8,28 +5,17 @@ from tests.skillsearch.skill import Skill
 
 
 class States(IStates):
-    """
-    A collection of static methods that generate responses based on the current session attributes.
-    Each method corresponds to a state of the FSM.
-    """
-
     session_attributes_cls = SessionAttributes
     default_prompt = "What skill do you want to find"
 
-    def no_results_search(self) -> response.Response:  # pylint: disable=no-self-use
-        """
-        if user refuses to remove category filter, then ask him to rephrase
-        """
+    def no_results(self) -> response.Response:
         return response.Response(
             speech=f"You asked for {self.attributes.slots.query},"
                    f" I could not find any such skills. Please rephrase.",
             reprompt=States.default_prompt
         )
 
-    def one_result_search(self) -> response.Response:
-        """
-        when a search results in exactly one result
-        """
+    def one_result(self) -> response.Response:
         skill = self.attributes.skill
         attributes = self.attributes
         return response.Response(
@@ -45,10 +31,7 @@ class States(IStates):
             reprompt=States.default_prompt
         )
 
-    def many_results_search(self) -> response.Response:
-        """
-        when a search results in multiple results, allowing for the user to filter them down
-        """
+    def many_results(self) -> response.Response:
         attributes = self.attributes
         return response.Response(
             speech=f"Searching for {attributes.slots.query}."
@@ -67,14 +50,10 @@ class States(IStates):
     @with_transitions(
         {
             'trigger': amazon_intent.NO,
-            'source': ['many_results_search']
+            'source': ['many_results']
         }
     )
     def rephrase_or_refine(self) -> response.Response:
-        """
-        when we're asking the user to refine a search because there are too many results and we
-        haven't yet found the skill the user wants
-        """
         return response.Response(
             speech="Please rephrase",
             reprompt="Rephrase your query."
@@ -85,9 +64,6 @@ class States(IStates):
         'source': ['describing', 'is_that_all'],
     })
     def search_prompt(self) -> response.Response:
-        """
-        when we're asking the user to conduct a new search
-        """
         return response.Response(
             speech=States.default_prompt,
             reprompt=States.default_prompt
@@ -96,14 +72,11 @@ class States(IStates):
     @with_transitions(
         {
             'trigger': amazon_intent.YES,
-            'source': ['one_result_search', 'many_results_search'],
+            'source': ['one_result', 'many_results'],
             'prepare': 'm_retrieve_skill_with_id'
         }
     )
     def describing(self) -> response.Response:
-        """
-        Describe a skill, used in response generator
-        """
         skill = self.attributes.skill
         if skill.num_ratings > 0:
             rating_str = f"{skill.avg_rating} (from {skill.num_ratings} reviews)"
@@ -127,7 +100,7 @@ class States(IStates):
     @with_transitions(
         {
             'trigger': amazon_intent.NO,
-            'source': ['one_result_search']
+            'source': ['one_result']
         },
         {
             'trigger': amazon_intent.CANCEL,
@@ -139,9 +112,6 @@ class States(IStates):
         }
     )
     def is_that_all(self) -> response.Response:
-        """
-        when we want to see if the user is done with the skill
-        """
         return response.Response(
             speech="Okay, will that be all?",
             reprompt="Will that be all?"
@@ -158,28 +128,11 @@ class States(IStates):
         }
     )
     def exiting(self) -> response.Response:
-        """
-        when the user is done with the skill and wants to exit
-        """
         return response.end(States.skill_name)
 
 
 def _get_verbal_skill(skill: Skill) -> str:
-    """
-    Get the natural language representation of a skill
-
-    This tells the user the name of the skill
-
-    >>> _get_verbal_skill(Skill(name='AI thing', category='Smart Home'))
-    'AI thing in the category Smart Home'
-
-    Also lists the creator when known
-
-    >>> _get_verbal_skill(Skill(name='AI thing', creator='AI2', category='Smart Home'))
-    'AI thing by AI2 in the category Smart Home'
-    """
     category_str = f" in the category {skill.category}"
-
     if skill.creator:
         return f"{skill.name} by {skill.creator}{category_str}"
     return f"{skill.name}{category_str}"
@@ -199,7 +152,4 @@ def _get_verbal_ratings(skill: Skill, say_no_reviews: bool = True) -> str:
 
 
 def _get_highlights(skill: Skill):
-    """
-    Get highlights for a skill
-    """
     return '\n'.join([h for _, hs in skill.meta.highlight.to_dict().items() for h in hs])

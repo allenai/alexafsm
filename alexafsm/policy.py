@@ -1,6 +1,3 @@
-"""
-Conversational logic
-"""
 import inspect
 import json
 import logging
@@ -14,7 +11,7 @@ from transitions import Machine, MachineError
 from voicelabs import VoiceInsights
 
 from alexafsm import response
-from alexafsm.session_attributes import INITIAL_STATE
+from alexafsm.session_attributes import INITIAL_STATE, SessionAttributes
 from alexafsm.states import States
 
 logger = logging.getLogger(__name__)
@@ -22,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 class Policy:
     """
-    Finite state machine that describes how to interact with user
+    Finite state machine that describes how to interact with user.
+    Use a lightweight FSM library at https://github.com/tyarkoni/transitions
     """
 
     # "Abstract" class properties to be overwritten/set in inherited classes.
@@ -74,7 +72,7 @@ class Policy:
     @classmethod
     def initialize(cls):
         """
-        Construct a policy in initial state.
+        Construct a policy in initial state
         """
         states = cls.states_cls.from_request(request=None)
         return cls(states)
@@ -83,33 +81,37 @@ class Policy:
     @lru_cache(maxsize=32)
     def get_policy(cls, session_id: str):
         """
-        Manage a pool of policies that handles multiple sessions at the same time.
+        Manage a pool of policies that handles multiple sessions at the same time
+        Simple override this method to use a different maxsize value
         """
         return cls.initialize()
 
     def update_with_request(self, request):
         """
-        Update the session attributes with a request.
+        Update the session attributes with a request
         """
         self.states.attributes = type(self.states.attributes).from_request(request)
-        self.state = self.states.attributes.state
+        self.state = self.attributes.state
+
+    @property
+    def attributes(self) -> SessionAttributes:
+        return self.states.attributes
 
     def execute(self) -> response.Response:
         """
         Called when the user specifies an intent for this skill
         """
-        states = self.states
-        attributes = states.attributes
+        intent = self.attributes.intent
         previous_state = self.state
         try:
             # trigger is added by transitions library
-            self.trigger(attributes.intent)
+            self.trigger(intent)
             current_state = self.state
             logger.info(f"Changed states {previous_state} -> {current_state} "
-                        f"through intent {attributes.intent}")
-            states.attributes.state = current_state
+                        f"through intent {intent}")
+            self.attributes.state = current_state
             resp_function = getattr(type(self.states), current_state)
-            return resp_function(states)
+            return resp_function(self.states)
         except MachineError as exception:
             logger.error(str(exception))
             return response.NOT_UNDERSTOOD
@@ -132,7 +134,7 @@ class Policy:
         elif request_type == 'IntentRequest':
             intent = req['intent']
             self.update_with_request(request)
-            logger.info(f"Policy id: {id(self)}")
+            logger.info(f"Policy id: {id(self)}, cache info: {Policy.get_policy.cache_info()}")
             resp = self.execute()
             resp = resp._replace(session_attributes=self.states.attributes)
             if voice_insights:
