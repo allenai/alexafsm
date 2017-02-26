@@ -77,7 +77,6 @@ Each method encodes the following:
 * The method may be decorated with one or several transitions, using `with_transitions`
 decorators. Transitions can be inbound (`source` needs to be specified) or outbound (`dest`
 needs to be specified). 
- `many_results`. 
 * Each method returns a `Response` object which is sent to Alexa. 
 * Transitions can be specified with `prepare`, `after`, and `conditions` attributes. See
 https://github.com/tyarkoni/transitions for detailed documentations. The values of these
