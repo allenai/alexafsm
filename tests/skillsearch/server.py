@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+"""
+This demonstrates a Flask server that uses alexafsm-based skill search
+"""
 
 import getopt
 import json
@@ -24,6 +26,8 @@ vi = None
 def main():
     req = flask_request.json
     policy = Policy.get_policy(req['session']['sessionId'])
+    # Alternatively, use policy = Policy.initialize() to bypass policy pool
+
     return json.dumps(policy.handle(req, vi).build_alexa_response()).encode('utf-8')
 
 
