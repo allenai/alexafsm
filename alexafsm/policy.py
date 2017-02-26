@@ -148,7 +148,7 @@ class Policy:
     @classmethod
     def validate(cls, schema_file: str, ignore_intents: Set[str] = ()):
         """
-        Check for inconsistencies in policy definition.
+        Check for inconsistencies in policy definition
         """
         schema = {}
         with open(schema_file, mode='r') as f:

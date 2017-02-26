@@ -4,3 +4,4 @@ flask==0.12
 livereload==2.5.1
 transitions==0.4.3
 voicelabs==0.0.10
+pytest==3.0.5
