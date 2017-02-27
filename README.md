@@ -4,6 +4,15 @@ alexafsm
 * Finite-state machine library for building complex Alexa conversations.
 * Free software: Apache Software License 2.0.
 
+Dialog agents need to keep track of the various pieces of information to make 
+decisions how to respond to a given user input. This is referred to as context,
+session, or state tracking. As the dialog complexity increases, this 
+state-tracking logic becomes harder to write, debug, and maintain. This library
+takes the finite-state machine design to address this complexity. Developers
+using this library can model dialog agents with first-class concepts such as
+states, attributes, transition, and actions. Visualization and other tools are
+also provided to understand and debug complex FSM conversations.
+
 ## Features
 
 * FSM-based library for building Alexa skills with complex dialog state tracking. 
