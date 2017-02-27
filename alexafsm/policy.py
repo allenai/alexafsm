@@ -1,17 +1,15 @@
-import inspect
-import json
+import importlib
 import logging
 import os
 from abc import abstractmethod
 from functools import lru_cache
 
-from typing import TypeVar, List, Set
-
-from transitions import Machine, MachineError
+from transitions import MachineError
+from typing import TypeVar, List
 from voicelabs import VoiceInsights
 
 from alexafsm import response
-from alexafsm.session_attributes import INITIAL_STATE, SessionAttributes
+from alexafsm.session_attributes import SessionAttributes
 from alexafsm.states import States
 
 logger = logging.getLogger(__name__)
@@ -26,11 +24,14 @@ class Policy:
     # "Abstract" class properties to be overwritten/set in inherited classes.
     states_cls = None
 
-    def __init__(self, states: States):
+    def __init__(self, states: States, with_graph: bool = False):
         self.states = states
         self.state = states.attributes.state
         state_names, transitions = type(states).get_states_transitions()
-        self.machine = Machine(
+        machine_cls = \
+            importlib.import_module('transitions.extensions').GraphMachine if with_graph else \
+            importlib.import_module('transitions').Machine
+        self.machine = machine_cls(
             model=self,
             states=state_names,
             initial=states.attributes.state,
@@ -70,12 +71,12 @@ class Policy:
         return f"m_{dest}"
 
     @classmethod
-    def initialize(cls):
+    def initialize(cls, with_graph: bool = False):
         """
         Construct a policy in initial state
         """
         states = cls.states_cls.from_request(request=None)
-        return cls(states)
+        return cls(states, with_graph)
 
     @classmethod
     @lru_cache(maxsize=32)
@@ -144,50 +145,3 @@ class Policy:
             resp = response.end(self.states.skill_name)
 
         return resp
-
-    @classmethod
-    def validate(cls, schema_file: str, ignore_intents: Set[str] = ()):
-        """
-        Check for inconsistencies in policy definition
-        """
-        schema = {}
-        with open(schema_file, mode='r') as f:
-            schema = json.loads(f.read())
-
-        intents = [intent['intent'] for intent in schema['intents']
-                   if intent['intent'] not in ignore_intents]
-        policy = cls.initialize()
-        states = policy.machine.states
-        events = []
-        states_have_out_transitions = set()
-        states_have_in_transitions = set()
-        funcs = [func for func, _ in inspect.getmembers(cls, predicate=inspect.isfunction)]
-
-        def _validate_transition(tran):
-            assert tran.source in states, f"Invalid source state: {tran.source}!!"
-            assert tran.dest in states, f"Invalid dest state: {tran.dest}!!"
-            assert all(prep in funcs for prep in tran.prepare), \
-                f"Invalid prepare function: {tran.prepare}!!"
-            assert all(cond.func in funcs for cond in tran.conditions), \
-                f"Invalid conditions function: {tran.conditions}!!"
-
-            states_have_in_transitions.add(tran.dest)
-            states_have_out_transitions.add(tran.source)
-
-        for _, event in policy.machine.events.items():
-            assert event.name in intents, f"Invalid event/trigger: {event.name}!"
-            events.append(event.name)
-
-            for source, trans in event.transitions.items():
-                for transition in trans:
-                    assert source in states, f"Invalid source state: {source}!!"
-                    _validate_transition(transition)
-
-        intent_diff = set(intents) - set(events)
-        assert not intent_diff, f"Some intents are not handled: {intent_diff}"
-
-        in_diff = set(states) - states_have_in_transitions - {INITIAL_STATE}
-        out_diff = set(states) - states_have_out_transitions - set('exiting')
-
-        assert not in_diff, f"Some states have no inbound transitions: {in_diff}"
-        assert not out_diff, f"Some states have no outbound transitions: {out_diff}"

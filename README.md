@@ -2,14 +2,16 @@ alexafsm
 ========
 
 * Finite-state machine library for building complex Alexa conversations.
-* Written in Python 3.6 (primarily for type annotation and string interpolation).
 * Free software: Apache Software License 2.0.
 
 ## Features
 
 * FSM-based library for building Alexa skills with complex dialog state tracking. 
-* Built-in analytics with [VoiceLabs](http://voicelabs.co/).
+* Tools to validate, visualize, and print the FSM graph.
+* Option to use session Id-based pool of session handlers.
+* Support analytics with [VoiceLabs](http://voicelabs.co/).
 * Can be paired with any Python server library (Flask, CherryPy, etc.)
+* Written in Python 3.6 (primarily for type annotation and string interpolation).
 
 ## Getting Started
 
@@ -78,9 +80,12 @@ Each method encodes the following:
 decorators. Transitions can be inbound (`source` needs to be specified) or outbound (`dest`
 needs to be specified). 
 * Each method returns a `Response` object which is sent to Alexa. 
-* Transitions can be specified with `prepare`, `after`, and `conditions` attributes. See
+* Transitions can be specified with `prepare` and `conditions` attributes. See
 https://github.com/tyarkoni/transitions for detailed documentations. The values of these
-attributes are parameter-less methods of the `Policy` class, which is described next.
+attributes are parameter-less methods of the `Policy` class.
+* The `prepare` methods are responsible for "actions" of the FSM such as querying
+a database. They are the only methods responsible for side-effects, e.g. modifying
+the attributes of the states. This design facilitates ease of debugging. 
       
 ### `Policy` 
 
@@ -118,3 +123,118 @@ def main():
     return json.dumps(policy.handle(req).build_alexa_response()).encode('utf-8')
 ```
 
+## Other Tools
+
+`alexafsm` supports validation, graph visualization, and printing of FSM.
+
+### Validation
+
+Simply initialize a `Policy` before calling `validate`. This function takes as
+input the path to the skill's Alexa intent schema json file and performs the 
+following checks:
+
+* All Alexa intents have corresponding events/triggers in the FSM.
+* All states have either inbound or outbound transitions.
+* All transitions are specified with valid source and destination states.
+* All conditions and prepare actions are handled with methods in the `Policy` class.
+
+### Graph Visualization
+
+`alexafsm` uses the `transitions` library's API to draw the FSM graph. For example,
+the skill search skill's FSM can be visualized using the [graph.py](https://github.com/allenai/alexafsm/blob/master/tests/skillsearch/server.py).
+invoked from [graph.sh](https://github.com/allenai/alexafsm/blob/master/tests/skillsearch/graph.sh).
+The resulting graph is displayed follow:
+
+![FSM Example](https://github.com/allenai/alexafsm/blob/master/tests/skillsearch/fsm.png)
+
+### Graph Printout
+
+For complex graphs, it may be easier to inspect the FSM in text format. Use the 
+`print_machine` method to accomplish this. The output for the skill search skill is
+below:
+
+```text
+Machine states:
+	initial, describing, exiting, is_that_all, many_results, no_results, one_result, rephrase_or_refine, search_prompt
+
+Events and transitions:
+
+Event: AMAZON.YesIntent
+	Source: one_result
+		one_result -> describing, prepare: ['m_retrieve_skill_with_id']
+	Source: many_results
+		many_results -> describing, prepare: ['m_retrieve_skill_with_id']
+	Source: describing
+		describing -> exiting
+	Source: is_that_all
+		is_that_all -> exiting
+Event: AMAZON.CancelIntent
+	Source: initial
+		initial -> exiting
+	Source: describing
+		describing -> exiting
+		describing -> is_that_all
+	Source: exiting
+		exiting -> exiting
+	Source: is_that_all
+		is_that_all -> exiting
+	Source: many_results
+		many_results -> exiting
+	Source: no_results
+		no_results -> exiting
+	Source: one_result
+		one_result -> exiting
+	Source: rephrase_or_refine
+		rephrase_or_refine -> exiting
+	Source: search_prompt
+		search_prompt -> exiting
+Event: AMAZON.NoIntent
+	Source: one_result
+		one_result -> is_that_all
+	Source: many_results
+		many_results -> rephrase_or_refine
+	Source: describing
+		describing -> search_prompt
+	Source: is_that_all
+		is_that_all -> search_prompt
+Event: AMAZON.StopIntent
+	Source: describing
+		describing -> is_that_all
+Event: Search
+	Source: initial
+		initial -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		initial -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		initial -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: describing
+		describing -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		describing -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		describing -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: exiting
+		exiting -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		exiting -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		exiting -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: is_that_all
+		is_that_all -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		is_that_all -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		is_that_all -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: many_results
+		many_results -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		many_results -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		many_results -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: no_results
+		no_results -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		no_results -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		no_results -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: one_result
+		one_result -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		one_result -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		one_result -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: rephrase_or_refine
+		rephrase_or_refine -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		rephrase_or_refine -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		rephrase_or_refine -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+	Source: search_prompt
+		search_prompt -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
+		search_prompt -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
+		search_prompt -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+```
