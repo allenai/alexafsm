@@ -17,6 +17,9 @@ class SessionAttributes:
     not_sent_fields = []
 
     def __init__(self, intent: str = None, request_id: str = None, slots=None, state: str = INITIAL_STATE):
+        # make sure that we don't accidentally make slots just a string
+        assert not isinstance(slots, str)
+        
         self.intent = intent
         self.request_id = request_id
         self.slots = slots
