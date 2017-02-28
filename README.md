@@ -37,7 +37,7 @@ write an `alexafsm` skill. An Alexa skill is composed of the following three cla
 `SessionAttributes` is a class that holds session attributes (`alexa_request['session']['attributes']`)
 and any information we need to keep track of dialog state.
 * The core attributes are `intent`, `slots`, and `state`. 
-*`intent` and `slots` map directly to Alexa's concepts. 
+* `intent` and `slots` map directly to Alexa's concepts.
 * `slots` should be of type `Slots`, which in turn is defined as a named tuple, one 
 field for each slot type. In the skill search example, `Slots = namedtuple('Slots', ['query']`).
 This named tuple class should be specified in the class definition as `slots_cls = Slots`.
@@ -134,7 +134,7 @@ def main():
 
 ## Other Tools
 
-`alexafsm` supports validation, graph visualization, and printing of FSM.
+`alexafsm` supports validation, graph visualization, and printing of the FSM.
 
 ### Validation
 
