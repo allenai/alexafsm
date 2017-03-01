@@ -90,12 +90,12 @@ def recordable(record_dir_function):
     Pass record=True to the function to save results
     Pass playback=True to the function call to load saved results
     """
-    def cache_filename(kwargs):
-        kwargs_as_str = str(sorted(kwargs.items())).encode('utf8')
-        kwargs_hash = hashlib.md5(kwargs_as_str).hexdigest()
-        return f'{external_resource_function.__name__}_{kwargs_hash}.pickle'
-
     def real_decorator(external_resource_function):
+        def cache_filename(kwargs):
+            kwargs_as_str = str(sorted(kwargs.items())).encode('utf8')
+            kwargs_hash = hashlib.md5(kwargs_as_str).hexdigest()
+            return f'{external_resource_function.__name__}_{kwargs_hash}.pickle'
+
         def wrapper(playback: bool = False, record: bool = False, **kwargs):
             filename = f'{record_dir_function()}/{cache_filename(kwargs)}'
             if playback:
