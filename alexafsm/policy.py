@@ -151,7 +151,7 @@ class Policy:
             raise Exception(f'Unknown request type {request_type}')
 
         if record_dir:
-            request_id = req['request']['requestId']
+            request_id = req['requestId']
             with open(f'{record_dir}/{request_id}.input', 'w') as input_file:
                 input_file.write(json.dumps(request))
             with open(f'{record_dir}/{request_id}.output', 'w') as output_file:
