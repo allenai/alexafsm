@@ -1,6 +1,7 @@
 import importlib
 import logging
 import os
+import json
 from abc import abstractmethod
 from functools import lru_cache
 
@@ -117,9 +118,12 @@ class Policy:
             logger.error(str(exception))
             return response.NOT_UNDERSTOOD
 
-    def handle(self, request: dict, voice_insights: VoiceInsights = None):
+    def handle(self, request: dict, voice_insights: VoiceInsights = None, record_dir: str = None):
         """
         Method that handles Alexa post request in json format
+
+        If record_dir is specified, this will record the request in the given directory for later
+        playback for testing purposes
         """
         (req, session) = (request['request'], request['session'])
         logger.info(f"applicationId = {session['application']['applicationId']}")
@@ -143,5 +147,14 @@ class Policy:
                                      response=resp.build_alexa_response())
         elif request_type == 'SessionEndedRequest':
             resp = response.end(self.states.skill_name)
+        else:
+            raise Exception(f'Unknown request type {request_type}')
+
+        if record_dir:
+            request_id = req['request']['requestId']
+            with open(f'{record_dir}/{request_id}.input', 'w') as input_file:
+                input_file.write(json.dumps(request))
+            with open(f'{record_dir}/{request_id}.output', 'w') as output_file:
+                output_file.write(json.dumps(resp))
 
         return resp
