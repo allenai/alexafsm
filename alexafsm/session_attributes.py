@@ -16,8 +16,12 @@ class SessionAttributes:
     # List of (big) fields we don't want to send back to Alexa
     not_sent_fields = []
 
-    def __init__(self, intent: str = None, slots=None, state: str = INITIAL_STATE):
+    def __init__(self, intent: str = None, request_id: str = None, slots=None, state: str = INITIAL_STATE):
+        # make sure that we don't accidentally make slots just a string
+        assert not isinstance(slots, str)
+        
         self.intent = intent
+        self.request_id = request_id
         self.slots = slots
         self.state = state
 
@@ -35,6 +39,7 @@ class SessionAttributes:
         intent = request['request']['intent']
         res = cls(**(request['session'].get('attributes', {})))
         res.intent = intent['name']
+        res.request_id = request['request']['requestId']
 
         # Update the slots attribute with the correct (namedtuple) type (from a dict)
         slots = _slots_from_dict(slots_cls, intent.get('slots'))
