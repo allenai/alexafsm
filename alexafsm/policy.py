@@ -155,6 +155,6 @@ class Policy:
             with open(f'{record_dir}/{request_id}.input', 'w') as input_file:
                 input_file.write(json.dumps(request))
             with open(f'{record_dir}/{request_id}.output', 'w') as output_file:
-                output_file.write(json.dumps(resp))
+                output_file.write(json.dumps(resp.build_alexa_response()))
 
         return resp
