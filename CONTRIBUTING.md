@@ -63,6 +63,7 @@ Ready to contribute? Here's how to set up `alexafsm` for local development.
 
         $ mkvirtualenv alexafsm -p `which python3.6`
         $ cd alexafsm/
+        $ pip install -r requirements_dev.txt
         $ python setup.py develop
 
    On other operating systems, replace ``which python3.6`` with the path
