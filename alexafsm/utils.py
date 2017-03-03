@@ -34,6 +34,12 @@ def validate(policy: Policy, schema_file: str, ignore_intents: Set[str] = ()):
         states_have_in_transitions.add(tran.dest)
         states_have_out_transitions.add(tran.source)
 
+    def _validate_ambiguous_transition(event, source, trans):
+        unconditional_trans = [tran for tran in trans if not tran.conditions]
+        assert len(unconditional_trans) < 2,\
+            f"Event {event} for source {source} has multiple unconditional out-bound transitions:" \
+            f" {', '.join([tran.dest for tran in trans])}"
+
     for _, event in policy.machine.events.items():
         assert event.name in intents, f"Invalid event/trigger: {event.name}!"
         events.append(event.name)
@@ -42,6 +48,8 @@ def validate(policy: Policy, schema_file: str, ignore_intents: Set[str] = ()):
             for transition in trans:
                 assert source in states, f"Invalid source state: {source}!!"
                 _validate_transition(transition)
+
+            _validate_ambiguous_transition(event.name, source, trans)
 
     intent_diff = set(intents) - set(events)
     assert not intent_diff, f"Some intents are not handled: {intent_diff}"
