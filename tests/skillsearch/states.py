@@ -103,10 +103,6 @@ class States(IStates):
             'source': ['one_result']
         },
         {
-            'trigger': amazon_intent.CANCEL,
-            'source': 'describing'
-        },
-        {
             'trigger': amazon_intent.STOP,
             'source': 'describing'
         }
