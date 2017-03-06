@@ -12,6 +12,7 @@ from voicelabs import VoiceInsights
 from alexafsm import response
 from alexafsm.session_attributes import SessionAttributes
 from alexafsm.states import States
+from alexafsm.test_helpers import input_request_file, output_response_file
 
 logger = logging.getLogger(__name__)
 
@@ -152,9 +153,9 @@ class Policy:
 
         if record_dir:
             request_id = req['requestId']
-            with open(f'{record_dir}/{request_id}.input', 'w') as input_file:
+            with open(input_request_file(record_dir, request_id), 'w') as input_file:
                 input_file.write(json.dumps(request))
-            with open(f'{record_dir}/{request_id}.output', 'w') as output_file:
+            with open(output_response_file(record_dir, request_id), 'w') as output_file:
                 output_file.write(json.dumps(resp.build_alexa_response()))
 
         return resp

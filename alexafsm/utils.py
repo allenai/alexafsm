@@ -84,3 +84,67 @@ def print_machine(policy: Policy):
 def graph(policy_cls, png_file):
     policy = policy_cls.initialize(with_graph=True)
     policy.graph.draw(png_file, prog='dot')
+
+
+def get_dialogs(request, response):
+    """
+    Return key information about a conversation turn as stored in a pair of request & response
+    """
+    request_id = request['request']['requestId']
+    from_state = request['session']['attributes'].get('state', INITIAL_STATE)
+    intent = response['sessionAttributes']['intent']
+    slots = response['sessionAttributes'].get('slots', None)
+    to_state = response['sessionAttributes'].get('state', None)
+    speech = response['response']['outputSpeech']['text']
+    return request_id, from_state, intent, slots, to_state, speech
+
+
+def events_states_transitions(policy: Policy):
+    """
+    Return events, states, and transitions of a policy.
+    Initial and exiting states are excluded
+    """
+    all_states = set(policy.machine.states.keys())
+    all_states.remove(INITIAL_STATE)
+    all_states.remove('exiting')
+    all_events = set()
+    all_transitions = set()
+    for _, e in policy.machine.events.items():
+        all_events.add(e.name)
+        for source, transitions in e.transitions.items():
+            for transition in transitions:
+                all_transitions.add((source, transition.dest))
+
+    return all_events, all_states, all_transitions
+
+
+def used_events_states_transitions(recorded_requests_responses):
+    """
+    Based on recorded data, compute and return the used events, states, and transitions
+    """
+    used_events = set()
+    used_states = set()
+    used_transitions = set()
+    dialog_data = [get_dialogs(request, response)
+                   for request, response in recorded_requests_responses]
+    for request_id, from_state, intent, slots, to_state, speech in dialog_data:
+        used_events.add(intent)
+        used_states.add(from_state)
+        used_states.add(to_state)
+        used_transitions.add((from_state, to_state))
+
+    if INITIAL_STATE in used_states:
+        used_states.remove(INITIAL_STATE)
+    return used_events, used_states, used_transitions
+
+
+def unused_events_states_transitions(policy, recorded_requests_responses):
+    """
+    Based on recorded data and a policy, compute and return the unused events, states, and transitions
+    """
+    all_events, all_states, all_transitions = events_states_transitions(policy)
+    used_events, used_states, used_transitions = used_events_states_transitions(recorded_requests_responses)
+    unused_states = all_states - used_states
+    unused_events = all_events - used_events
+    unused_transitions = all_transitions - used_transitions
+    return unused_events, unused_states, unused_transitions

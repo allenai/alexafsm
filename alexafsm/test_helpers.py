@@ -1,26 +1,9 @@
+import glob
 import hashlib
 import pickle
 import json
 
-from alexafsm.policy import Policy
-
-
-def get_json_from_file(filename: str):
-    """
-    Get and parse contents of JSON file
-    """
-    text = '\n'.join(open(filename).readlines())
-    return json.loads(text)
-
-
-def verify_request(policy: Policy, record_dir: str, request_id: str):
-    """
-    Verify reproducibility of a single request
-    """
-    request = get_json_from_file(f'{record_dir}/{request_id}.input')
-    expected_response = get_json_from_file(f'{record_dir}/{request_id}.output')
-
-    assert policy.handle(request).build_alexa_response() == expected_response
+from dateutil import parser
 
 
 def recordable(record_dir_function):
@@ -33,6 +16,7 @@ def recordable(record_dir_function):
     Pass record=True to the function to save results
     Pass playback=True to the function call to load saved results
     """
+
     def real_decorator(external_resource_function):
         def cache_filename(kwargs):
             kwargs_as_str = str(sorted(kwargs.items())).encode('utf8')
@@ -55,4 +39,43 @@ def recordable(record_dir_function):
                 return external_resource_function(**kwargs)
 
         return wrapper
+
     return real_decorator
+
+
+def get_requests_responses(record_dir: str):
+    """
+    Return the (json) requests and expected responses from previous recordings.
+    These are sorted by requests' timestamps
+    """
+    requests = get_timesorted_requests(record_dir)
+    expected_responses = []
+    for request in requests:
+        request_id = request['request']['requestId']
+        expected_responses.append(get_json_from_file(output_response_file(record_dir, request_id)))
+    return zip(requests, expected_responses)
+
+
+def get_timesorted_requests(record_dir: str):
+    """
+    Return json requests from recorded directory, stored in *.input files
+    """
+    requests = [get_json_from_file(input_file)
+                for input_file in glob.iglob(f"{record_dir}/*.input")]
+    return sorted(requests, key=lambda r: parser.parse(r['request']['timestamp']))
+
+
+def get_json_from_file(filename: str):
+    """
+    Get and parse contents of JSON file
+    """
+    text = '\n'.join(open(filename).readlines())
+    return json.loads(text)
+
+
+def input_request_file(record_dir, request_id):
+    return f"{record_dir}/{request_id}.input"
+
+
+def output_response_file(record_dir, request_id):
+    return f"{record_dir}/{request_id}.output"
