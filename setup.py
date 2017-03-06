@@ -25,7 +25,7 @@ test_requirements = [
 
 setup(
     name='alexafsm',
-    version='0.1.3',
+    version='0.1.4',
     description="Finite-state machine library for building complex Alexa conversations",
     long_description=readme + '\n\n' + history,
     author="Allen AI",
