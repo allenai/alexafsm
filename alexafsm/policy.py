@@ -153,6 +153,6 @@ class Policy:
 
         if record_filename:
             with open(record_filename, 'a') as record_file:
-                record_file.write(json.dumps([request, resp.build_alexa_response()]))
+                record_file.write(json.dumps([request, resp.build_alexa_response()]) + '\n')
 
         return resp
