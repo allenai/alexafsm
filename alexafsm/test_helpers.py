@@ -1,9 +1,6 @@
-import glob
 import hashlib
 import pickle
 import json
-
-from dateutil import parser
 
 
 def recordable(record_dir_function, is_playback, is_record):
@@ -43,39 +40,10 @@ def recordable(record_dir_function, is_playback, is_record):
     return real_decorator
 
 
-def get_requests_responses(record_dir: str):
+def get_requests_responses(record_file: str):
     """
     Return the (json) requests and expected responses from previous recordings.
-    These are sorted by requests' timestamps
+    These are returned in the same order they were recorded in.
     """
-    requests = get_timesorted_requests(record_dir)
-    expected_responses = []
-    for request in requests:
-        request_id = request['request']['requestId']
-        expected_responses.append(get_json_from_file(output_response_file(record_dir, request_id)))
-    return zip(requests, expected_responses)
-
-
-def get_timesorted_requests(record_dir: str):
-    """
-    Return json requests from recorded directory, stored in *.input files
-    """
-    requests = [get_json_from_file(input_file)
-                for input_file in glob.iglob(f"{record_dir}/*.input")]
-    return sorted(requests, key=lambda r: parser.parse(r['request']['timestamp']))
-
-
-def get_json_from_file(filename: str):
-    """
-    Get and parse contents of JSON file
-    """
-    text = '\n'.join(open(filename).readlines())
-    return json.loads(text)
-
-
-def input_request_file(record_dir, request_id):
-    return f"{record_dir}/{request_id}.input"
-
-
-def output_response_file(record_dir, request_id):
-    return f"{record_dir}/{request_id}.output"
+    lines = open(record_file).readlines()
+    return [json.loads(line) for line in lines]
