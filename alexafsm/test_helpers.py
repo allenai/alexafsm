@@ -6,7 +6,7 @@ import json
 from dateutil import parser
 
 
-def recordable(record_dir_function):
+def recordable(record_dir_function, is_playback, is_record):
     """
     Record results of functions that depend on external resources
 
@@ -23,13 +23,13 @@ def recordable(record_dir_function):
             kwargs_hash = hashlib.md5(kwargs_as_str).hexdigest()
             return f'{external_resource_function.__name__}_{kwargs_hash}.pickle'
 
-        def wrapper(playback: bool = False, record: bool = False, **kwargs):
+        def wrapper(**kwargs):
             filename = f'{record_dir_function()}/{cache_filename(kwargs)}'
-            if playback:
+            if is_playback():
                 # pickle should already exist, read from disk
                 with open(filename, 'rb') as pickle_file:
                     return pickle.load(pickle_file)
-            elif record:
+            elif is_record():
                 # pickle doesn't yet exist, cache it
                 result = external_resource_function(**kwargs)
                 with open(filename, 'wb') as pickle_file:
