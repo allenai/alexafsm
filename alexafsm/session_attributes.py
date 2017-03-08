@@ -44,11 +44,14 @@ class SessionAttributes:
             res.state = INITIAL_STATE
         return res
 
-    def json_to_alexa(self) -> dict:
+    def json_to_alexa(self, not_sent_fields=None) -> dict:
         """
         When sending the payload to Alexa, do not send fields that are too big.
         """
-        res = {k: v for k, v in self.__dict__.items() if k not in self.not_sent_fields and v}
+        if not_sent_fields is None:
+            not_sent_fields = self.not_sent_fields
+
+        res = {k: v for k, v in self.__dict__.items() if k not in not_sent_fields and v}
         if 'slots' not in res:
             return res
 
