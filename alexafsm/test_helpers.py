@@ -46,4 +46,4 @@ def get_requests_responses(record_file: str):
     These are returned in the same order they were recorded in.
     """
     lines = open(record_file).readlines()
-    return [json.loads(line) for line in lines]
+    return [tuple(json.loads(line)) for line in lines]
