@@ -94,7 +94,7 @@ def get_dialogs(request, response):
     # there are no attributes when starting a new conversation from the alexa device
     session_attributes = request['session'].get('attributes', {})
     from_state = session_attributes.get('state', INITIAL_STATE)
-    intent = response['sessionAttributes']['intent']
+    intent = response['sessionAttributes'].get('intent', None)
     slots = response['sessionAttributes'].get('slots', None)
     to_state = response['sessionAttributes'].get('state', None)
     speech = response['response']['outputSpeech']['text']
