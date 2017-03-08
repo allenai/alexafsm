@@ -12,7 +12,6 @@ from voicelabs import VoiceInsights
 from alexafsm import response
 from alexafsm.session_attributes import SessionAttributes
 from alexafsm.states import States
-from alexafsm.test_helpers import input_request_file, output_response_file
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +118,8 @@ class Policy:
             logger.error(str(exception))
             return response.NOT_UNDERSTOOD
 
-    def handle(self, request: dict, voice_insights: VoiceInsights = None, record_dir: str = None):
+    def handle(self, request: dict, voice_insights: VoiceInsights = None,
+               record_filename: str = None):
         """
         Method that handles Alexa post request in json format
 
@@ -151,11 +151,8 @@ class Policy:
         else:
             raise Exception(f'Unknown request type {request_type}')
 
-        if record_dir:
-            request_id = req['requestId']
-            with open(input_request_file(record_dir, request_id), 'w') as input_file:
-                input_file.write(json.dumps(request))
-            with open(output_response_file(record_dir, request_id), 'w') as output_file:
-                output_file.write(json.dumps(resp.build_alexa_response()))
+        if record_filename:
+            with open(record_filename, 'a') as record_file:
+                record_file.write(json.dumps([request, resp.build_alexa_response()]) + '\n')
 
         return resp

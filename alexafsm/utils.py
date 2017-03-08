@@ -91,8 +91,10 @@ def get_dialogs(request, response):
     Return key information about a conversation turn as stored in a pair of request & response
     """
     request_id = request['request']['requestId']
-    from_state = request['session']['attributes'].get('state', INITIAL_STATE)
-    intent = response['sessionAttributes']['intent']
+    # there are no attributes when starting a new conversation from the alexa device
+    session_attributes = request['session'].get('attributes', {})
+    from_state = session_attributes.get('state', INITIAL_STATE)
+    intent = response['sessionAttributes'].get('intent', None)
     slots = response['sessionAttributes'].get('slots', None)
     to_state = response['sessionAttributes'].get('state', None)
     speech = response['response']['outputSpeech']['text']
