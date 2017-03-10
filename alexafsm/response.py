@@ -65,7 +65,7 @@ class Response(namedtuple('Response', ['speech', 'card', 'card_content', 'reprom
 
         return {
             'version': '1.0',
-            'sessionAttributes': self.session_attributes.json_to_alexa(),
+            'sessionAttributes': self.session_attributes,
             'response': resp
         }
 
