@@ -51,7 +51,7 @@ def test_request():
 
 def test_json_to_alexa():
     s = SessionAttributes.from_request(request)
-    js = s.json_to_alexa()
+    js = s.to_json()
     assert 'intent' not in js
     assert js['state'] == 'blissful'
     assert js['slots'] == Slots(love='loving', money='lots')
@@ -60,7 +60,44 @@ def test_json_to_alexa():
 def test_json_to_alexa_and_back():
     import json
     s = SessionAttributes.from_request(request)
-    js = json.dumps(s.json_to_alexa())
+    js = json.dumps(s.to_json())
+    request2 = {
+        'request': {'intent': {'name': 'foo'}},
+        'session': {'attributes': json.loads(js)}
+    }
+
+    s2 = SessionAttributes.from_request(request2)
+    assert s2.intent == 'foo'
+    assert s2.state == s.state
+    assert s2.slots == s.slots
+
+
+def test_empty_attributes():
+    import json
+
+    empty_attrs_request = {
+        'session': {
+            'attributes': {},
+        },
+        'request': {
+            'type': 'IntentRequest',
+            'intent': {
+                'name': 'Search',
+                'slots': {
+                    'Love': {
+                        'name': 'Love'
+                    },
+                    'Money': {
+                        'name': 'Money',
+                        'value': 'lots'
+                    }
+                }
+            }
+        }
+    }
+
+    s = SessionAttributes.from_request(empty_attrs_request)
+    js = json.dumps(s.to_json())
     request2 = {
         'request': {'intent': {'name': 'foo'}},
         'session': {'attributes': json.loads(js)}

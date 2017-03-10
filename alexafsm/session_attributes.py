@@ -27,8 +27,9 @@ class SessionAttributes:
         Construct session attributes object from request
         """
         slots_cls = cls.slots_cls
+        none_slots = _slots_from_dict(slots_cls, slots=None)
         if not request:
-            return cls(slots=_slots_from_dict(slots_cls, slots=None))
+            return cls(slots=none_slots)
 
         intent = request['request']['intent']
         res = cls(**(request['session'].get('attributes', {})))
@@ -37,7 +38,7 @@ class SessionAttributes:
             res.state = INITIAL_STATE
 
         # namedtuple deserialization from list of values
-        old_slots = slots_cls._make(res.slots)
+        old_slots = slots_cls._make(res.slots) if res.slots else none_slots
 
         # Construct new slots from the request
         new_slots = _slots_from_dict(slots_cls, intent.get('slots'))
