@@ -51,7 +51,7 @@ class SessionAttributes:
 
         return res
 
-    def json_to_alexa(self) -> dict:
+    def to_json(self) -> dict:
         """
         When sending the payload to Alexa, do not send fields that are too big.
         """
