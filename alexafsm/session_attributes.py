@@ -28,48 +28,34 @@ class SessionAttributes:
         """
         slots_cls = cls.slots_cls
         if not request:
-            res = cls()
-            res.slots = _slots_from_dict(slots_cls, slots=None)
-            return res
+            return cls(slots=_slots_from_dict(slots_cls, slots=None))
 
         intent = request['request']['intent']
         res = cls(**(request['session'].get('attributes', {})))
         res.intent = intent['name']
-
-        # Update the slots attribute with the correct (namedtuple) type (from a dict)
-        slots = _slots_from_dict(slots_cls, intent.get('slots'))
-        res.slots = slots_cls(**{f: res._get_val(slots, f) for f in slots._fields})
-
         if res.state is None:
             res.state = INITIAL_STATE
+
+        # namedtuple deserialization from list of values
+        old_slots = slots_cls._make(res.slots)
+
+        # Construct new slots from the request
+        new_slots = _slots_from_dict(slots_cls, intent.get('slots'))
+
+        # Update the slots attribute, using new slot values when exist
+        def _extract(f):
+            v = getattr(new_slots, f)
+            return v if v else getattr(old_slots, f)
+
+        res.slots = slots_cls(**{f: _extract(f) for f in old_slots._fields})
+
         return res
 
     def json_to_alexa(self) -> dict:
         """
         When sending the payload to Alexa, do not send fields that are too big.
         """
-        res = {k: v for k, v in self.__dict__.items() if k not in self.not_sent_fields and v}
-        if 'slots' not in res:
-            return res
-
-        slots_kwargs = {k: v for k, v in res['slots']._asdict().items() if v}
-        if slots_kwargs:
-            res['slots'] = slots_kwargs
-        else:
-            res.pop('slots', None)
-        return res
-
-    def _get_val(self, slots, prop: str):
-        """
-        Get the value for this property from slots, if exists
-        """
-        val = getattr(slots, prop)
-        if val:
-            return val
-        elif self.slots:
-            return self.slots.get(prop, None)
-
-        return None
+        return {k: v for k, v in self.__dict__.items() if k not in self.not_sent_fields and v}
 
 
 def _slots_from_dict(slots_cls, slots: dict):
