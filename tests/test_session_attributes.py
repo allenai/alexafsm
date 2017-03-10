@@ -14,9 +14,7 @@ request = {
     'session': {
         'attributes': {
             'state': 'blissful',
-            'slots': {
-                'love': 'loving'
-            }
+            'slots': ['loving', 'null']
         },
     },
     'request': {
@@ -56,4 +54,19 @@ def test_json_to_alexa():
     js = s.json_to_alexa()
     assert 'intent' not in js
     assert js['state'] == 'blissful'
-    assert js['slots'] == {'love': 'loving', 'money': 'lots'}
+    assert js['slots'] == Slots(love='loving', money='lots')
+
+
+def test_json_to_alexa_and_back():
+    import json
+    s = SessionAttributes.from_request(request)
+    js = json.dumps(s.json_to_alexa())
+    request2 = {
+        'request': {'intent': {'name': 'foo'}},
+        'session': {'attributes': json.loads(js)}
+    }
+
+    s2 = SessionAttributes.from_request(request2)
+    assert s2.intent == 'foo'
+    assert s2.state == s.state
+    assert s2.slots == s.slots
