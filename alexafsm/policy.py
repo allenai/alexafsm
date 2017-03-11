@@ -145,7 +145,7 @@ class Policy:
             resp = resp._replace(session_attributes=self.states.attributes)
             if voice_insights:
                 voice_insights.track(intent_name=intent['name'], intent_request=req,
-                                     response=resp.build_alexa_response())
+                                     response=resp.to_json())
         elif request_type == 'SessionEndedRequest':
             resp = response.end(self.states.skill_name)
         else:
@@ -153,6 +153,6 @@ class Policy:
 
         if record_filename:
             with open(record_filename, 'a') as record_file:
-                record_file.write(json.dumps([request, resp.build_alexa_response()]) + '\n')
+                record_file.write(json.dumps([request, resp]) + '\n')
 
         return resp
