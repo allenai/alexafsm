@@ -1,6 +1,6 @@
 from collections import namedtuple
 from elasticsearch_dsl.result import Response
-from alexafsm.session_attributes import SessionAttributes as ISessionAttributes
+from alexafsm.session_attributes import SessionAttributes as ISessionAttributes, INITIAL_STATE
 from tests.skillsearch.skill import Skill
 
 Slots = namedtuple('Slots', ['query'])
@@ -13,7 +13,7 @@ class SessionAttributes(ISessionAttributes):
     def __init__(self,
                  intent: str = None,
                  slots: Slots = None,
-                 state: str = None,
+                 state: str = INITIAL_STATE,
                  skill_id: str = None,
                  skill: Skill = None,
                  result: Response = None):
