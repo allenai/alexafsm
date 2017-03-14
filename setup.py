@@ -14,13 +14,13 @@ except (IOError, ImportError):
    readme = ''
 
 requirements = [
-    'transitions',
-    'voicelabs'
+    'transitions==0.5.0',
+    'voicelabs==0.0.10'
 ]
 
 test_requirements = [
-    'elasticsearch==5.0.1',
-    'elasticsearch-dsl==5.0.0'
+    'elasticsearch==5.1.0',
+    'elasticsearch-dsl==5.1.0'
 ]
 
 setup(
