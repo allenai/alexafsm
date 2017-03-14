@@ -45,5 +45,6 @@ def get_requests_responses(record_file: str):
     Return the (json) requests and expected responses from previous recordings.
     These are returned in the same order they were recorded in.
     """
-    lines = open(record_file).readlines()
+    with open(record_file) as f:
+        lines = f.readlines()
     return [tuple(json.loads(line)) for line in lines]
