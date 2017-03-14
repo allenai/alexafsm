@@ -22,7 +22,7 @@ class Response(namedtuple('Response', ['speech', 'card', 'card_content', 'reprom
                      card_content=card_content.strip(), image=image,
                      session_attributes=session_attributes)
 
-    def build_alexa_response(self):
+    def to_json(self):
         """
         Build entire Alexa response as a JSON-serializable dictionary
         """

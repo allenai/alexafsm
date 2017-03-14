@@ -28,7 +28,7 @@ def main():
     policy = Policy.get_policy(req['session']['sessionId'])
     # Alternatively, use policy = Policy.initialize() to bypass policy pool
 
-    return json.dumps(policy.handle(req, vi).build_alexa_response()).encode('utf-8')
+    return json.dumps(policy.handle(req, vi)).encode('utf-8')
 
 
 def _usage():
