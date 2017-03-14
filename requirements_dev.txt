@@ -1,5 +1,5 @@
-elasticsearch==5.0.1
-elasticsearch-dsl==5.0.0
+elasticsearch==5.1.0
+elasticsearch-dsl==5.1.0
 flask==0.12
 livereload==2.5.1
 transitions==0.5.0
