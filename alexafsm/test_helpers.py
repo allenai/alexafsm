@@ -24,8 +24,11 @@ def recordable(record_dir_function, is_playback, is_record):
 
         def wrapper(*args, **kwargs):
             # handle default kwargs where some kwarg may or may not be set with default values
-            kwonlydefaults = inspect.getfullargspec(external_resource_function).kwonlydefaults
-            full_kwargs = {**kwonlydefaults, **kwargs}
+            fullargspec = inspect.getfullargspec(external_resource_function)
+            arguments, defaults = fullargspec.args, fullargspec.defaults
+            default_kwargs = {k: v for k, v in zip(arguments[-len(defaults):], defaults)}
+
+            full_kwargs = {**default_kwargs, **kwargs}
             filename = f'{record_dir_function()}/{cache_filename(args, full_kwargs)}'
             if is_playback():
                 # pickle should already exist, read from disk
