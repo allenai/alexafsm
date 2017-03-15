@@ -1,6 +1,7 @@
 import hashlib
 import pickle
 import json
+import inspect
 
 
 def recordable(record_dir_function, is_playback, is_record):
@@ -22,7 +23,10 @@ def recordable(record_dir_function, is_playback, is_record):
             return f'{external_resource_function.__name__}_{hashed_args}.pickle'
 
         def wrapper(*args, **kwargs):
-            filename = f'{record_dir_function()}/{cache_filename(args, kwargs)}'
+            # handle default kwargs where some kwarg may or may not be set with default values
+            kwonlydefaults = inspect.getfullargspec(external_resource_function).kwonlydefaults
+            full_kwargs = {**kwonlydefaults, **kwargs}
+            filename = f'{record_dir_function()}/{cache_filename(args, full_kwargs)}'
             if is_playback():
                 # pickle should already exist, read from disk
                 with open(filename, 'rb') as pickle_file:
