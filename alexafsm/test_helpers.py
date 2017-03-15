@@ -17,9 +17,10 @@ def recordable(record_dir_function, is_playback, is_record):
 
     def real_decorator(external_resource_function):
         def cache_filename(args, kwargs):
-            args_as_str = str(args).encode('utf8')
-            kwargs_as_str = str(sorted(kwargs.items())).encode('utf8')
-            hashed_args = hashlib.md5(f"{args_as_str}{kwargs_as_str}").hexdigest()
+            args_as_str = str(args)
+            kwargs_as_str = str(sorted(kwargs.items()))
+            full_args = f"{args_as_str}{kwargs_as_str}"
+            hashed_args = hashlib.md5(full_args.encode('utf-8')).hexdigest()
             return f'{external_resource_function.__name__}_{hashed_args}.pickle'
 
         def wrapper(*args, **kwargs):
