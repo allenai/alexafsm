@@ -30,7 +30,7 @@ def validate(policy: Policy, schema_file: str, ignore_intents: Set[str] = ()):
             f"Invalid prepare function: {tran.prepare}!!"
         assert all(cond.func in funcs for cond in tran.conditions), \
             f"Invalid conditions function: {tran.conditions}!!"
-        assert all(after.func in funcs for after in tran.after), \
+        assert all(after in funcs for after in tran.after), \
             f"Invalid conditions function: {tran.after}!!"
 
         states_have_in_transitions.add(tran.dest)
