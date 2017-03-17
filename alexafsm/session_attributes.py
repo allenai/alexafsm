@@ -56,7 +56,8 @@ class SessionAttributes:
         """
         When sending the payload to Alexa, do not send fields that are too big.
         """
-        return {k: v for k, v in self.__dict__.items() if k not in self.not_sent_fields and v}
+        return {k: v for k, v in self.__dict__.items()
+                if k not in self.not_sent_fields and v is not None}
 
 
 def _slots_from_dict(slots_cls, slots: dict):
