@@ -38,6 +38,7 @@ class Policy:
             initial=states.attributes.state,
             auto_transitions=False
         )
+        self.attributes_backup = self.attributes
 
         for transition in transitions:
             self.machine.add_transition(**transition)
@@ -92,6 +93,8 @@ class Policy:
         """
         Update the session attributes with a request
         """
+        # backup attributes in case of invalid FSM transition
+        self.attributes_backup = self.attributes
         self.states.attributes = type(self.states.attributes).from_request(request)
         self.state = self.attributes.state
 
@@ -116,6 +119,8 @@ class Policy:
             return resp_function(self.states)
         except MachineError as exception:
             logger.error(str(exception))
+            # reset attributes
+            self.states.attributes = self.attributes_backup
             return response.NOT_UNDERSTOOD
 
     def handle(self, request: dict, voice_insights: VoiceInsights = None,
