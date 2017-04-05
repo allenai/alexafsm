@@ -25,7 +25,7 @@ class Policy:
     # "Abstract" class properties to be overwritten/set in inherited classes.
     states_cls = None
 
-    def __init__(self, states: States, with_graph: bool = False):
+    def __init__(self, states: States, request: dict = None, with_graph: bool = False):
         self.states = states
         self.state = states.attributes.state
         state_names, transitions = type(states).get_states_transitions()
