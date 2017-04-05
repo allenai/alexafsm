@@ -73,21 +73,12 @@ class Policy:
         return f"m_{dest}"
 
     @classmethod
-    def initialize(cls, with_graph: bool = False):
+    def initialize(cls, request: dict, with_graph: bool = False):
         """
         Construct a policy in initial state
         """
-        states = cls.states_cls.from_request(request=None)
-        return cls(states, with_graph)
-
-    @classmethod
-    @lru_cache(maxsize=32)
-    def get_policy(cls, session_id: str):
-        """
-        Manage a pool of policies that handles multiple sessions at the same time
-        Simple override this method to use a different maxsize value
-        """
-        return cls.initialize()
+        states = cls.states_cls.from_request(request=request)
+        return cls(states, request, with_graph)
 
     def update_with_request(self, request):
         """
@@ -102,6 +93,10 @@ class Policy:
     def attributes(self) -> SessionAttributes:
         return self.states.attributes
 
+    def get_current_state_response(self) -> response.Response:
+        resp_function = getattr(type(self.states), self.state)
+        return resp_function(self.states)
+
     def execute(self) -> response.Response:
         """
         Called when the user specifies an intent for this skill
@@ -115,8 +110,7 @@ class Policy:
             logger.info(f"Changed states {previous_state} -> {current_state} "
                         f"through intent {intent}")
             self.attributes.state = current_state
-            resp_function = getattr(type(self.states), current_state)
-            return resp_function(self.states)
+            return self.get_current_state_response()
         except MachineError as exception:
             logger.error(str(exception))
             # reset attributes
@@ -141,11 +135,10 @@ class Policy:
             voice_insights.initialize(app_token, session)
 
         if request_type == 'LaunchRequest':
-            resp = response.welcome(self.states.skill_name, self.states.default_prompt)
+            resp = self.get_current_state_response()
         elif request_type == 'IntentRequest':
             intent = req['intent']
             self.update_with_request(request)
-            logger.info(f"Policy id: {id(self)}, cache info: {Policy.get_policy.cache_info()}")
             resp = self.execute()
             resp = resp._replace(session_attributes=self.states.attributes)
             if voice_insights:

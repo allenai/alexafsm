@@ -31,8 +31,11 @@ class SessionAttributes:
         if not request:
             return cls(slots=none_slots)
 
-        intent = request['request']['intent']
         res = cls(**(request['session'].get('attributes', {})))
+
+        if 'intent' not in request['request']:  # e.g., when starting skill at beginning of session
+            return res
+        intent = request['request']['intent']
         res.intent = intent['name']
         if res.state is None:
             res.state = INITIAL_STATE

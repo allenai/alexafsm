@@ -70,12 +70,6 @@ class Response(namedtuple('Response', ['speech', 'card', 'card_content', 'reprom
         }
 
 
-def welcome(skill_name: str, default_prompt: str) -> Response:
-    return Response(
-        speech=f"Welcome to {skill_name}, {default_prompt}",
-        reprompt=default_prompt)
-
-
 def end(skill_name: str) -> Response:
     return Response(
         speech=f"Thank you for using {skill_name}",
