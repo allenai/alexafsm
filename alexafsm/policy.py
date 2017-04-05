@@ -73,7 +73,7 @@ class Policy:
         return f"m_{dest}"
 
     @classmethod
-    def initialize(cls, request: dict, with_graph: bool = False):
+    def initialize(cls, request: dict = None, with_graph: bool = False):
         """
         Construct a policy in initial state
         """
