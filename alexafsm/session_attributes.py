@@ -46,10 +46,11 @@ class SessionAttributes:
         # Construct new slots from the request
         new_slots = _slots_from_dict(slots_cls, intent.get('slots'))
 
-        # Update the slots attribute, using new slot values when exist
+        # Update the slots attribute, using new slot values regardless if they exist or not (skill
+        # should be able to tell if Amazon successfully extracted the intent slot or not)
         def _extract(f):
             v = getattr(new_slots, f)
-            return v if v else getattr(old_slots, f)
+            return v
 
         res.slots = slots_cls(**{f: _extract(f) for f in old_slots._fields})
 
