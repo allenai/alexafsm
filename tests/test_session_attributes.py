@@ -45,7 +45,7 @@ def test_none_request():
 def test_request():
     s = SessionAttributes.from_request(request)
     assert s.intent == 'Search'
-    assert s.slots == Slots(love='loving', money='lots')
+    assert s.slots == Slots(love=None, money='lots')
     assert s.state == 'blissful'
 
 
@@ -54,7 +54,7 @@ def test_json_to_alexa():
     js = s.to_json()
     assert 'intent' not in js
     assert js['state'] == 'blissful'
-    assert js['slots'] == Slots(love='loving', money='lots')
+    assert js['slots'] == Slots(love=None, money='lots')
 
 
 def test_json_to_alexa_and_back():
@@ -69,7 +69,7 @@ def test_json_to_alexa_and_back():
     s2 = SessionAttributes.from_request(request2)
     assert s2.intent == 'foo'
     assert s2.state == s.state
-    assert s2.slots == s.slots
+    assert s2.slots == Slots(love=None, money=None)  # new request has no slots
 
 
 def test_empty_attributes():
@@ -106,4 +106,4 @@ def test_empty_attributes():
     s2 = SessionAttributes.from_request(request2)
     assert s2.intent == 'foo'
     assert s2.state == s.state
-    assert s2.slots == s.slots
+    assert s2.slots == Slots(love=None, money=None)  # new request has no slots
