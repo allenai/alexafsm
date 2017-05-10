@@ -1,13 +1,34 @@
 {
     "intents": [
         {
-            "intent": "Search",
+            "intent": "NewSearch",
             "slots": [
                 {
                     "name": "Query",
                     "type": "QUERY"
                 }
             ]
+        },
+        {
+            "intent": "NthSkill",
+            "slots": [
+                {
+                    "name": "Nth",
+                    "type": "NTH"
+                }
+            ]
+        },
+        {
+            "intent": "DescribeRatings"
+        },
+        {
+            "intent": "PreviousSkill"
+        },
+        {
+            "intent": "NextSkill"
+        },
+        {
+            "intent": "AMAZON.HelpIntent"
         },
         {
             "intent": "AMAZON.YesIntent"

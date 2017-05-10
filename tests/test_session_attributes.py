@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 from alexafsm.session_attributes import SessionAttributes as ISessionAttributes, INITIAL_STATE
+import alexafsm.make_json_serializable  # NOQA
 
 Slots = namedtuple('Slots', ['love', 'money'])
 
@@ -60,7 +61,7 @@ def test_json_to_alexa():
 def test_json_to_alexa_and_back():
     import json
     s = SessionAttributes.from_request(request)
-    js = json.dumps(s.to_json())
+    js = json.dumps(s)
     request2 = {
         'request': {'intent': {'name': 'foo'}},
         'session': {'attributes': json.loads(js)}
@@ -97,7 +98,7 @@ def test_empty_attributes():
     }
 
     s = SessionAttributes.from_request(empty_attrs_request)
-    js = json.dumps(s.to_json())
+    js = json.dumps(s)
     request2 = {
         'request': {'intent': {'name': 'foo'}},
         'session': {'attributes': json.loads(js)}

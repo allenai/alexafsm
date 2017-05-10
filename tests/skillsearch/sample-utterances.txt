@@ -1,0 +1,57 @@
+AMAZON.HelpIntent what can i ask
+NewSearch i want {Query}
+NewSearch i want to {Query}
+NewSearch i want to find {Query}
+NewSearch i want to search for {Query}
+NewSearch i want to discover {Query}
+NewSearch i want a skill that can {Query}
+NewSearch i want a skill that {Query}
+NewSearch i want a skill to {Query}
+NewSearch how can i {Query}
+NewSearch how do i {Query}
+NewSearch find me a skill that can {Query}
+NewSearch find me a skill that {Query}
+NewSearch find me a skill to {Query}
+NthSkill tell me about the {Nth} skill
+NthSkill how about the {Nth} skill
+NthSkill what is the {Nth} skill
+NthSkill {Nth} skill
+NthSkill tell me about skill {Nth}
+NthSkill tell me about skill number {Nth}
+NthSkill what about skill {Nth}
+NthSkill skill number {Nth}
+NthSkill skill {Nth}
+NthSkill i want to go to the {Nth} skill
+NthSkill i want to go to skill {Nth}
+PreviousSkill previous
+PreviousSkill previous skill
+PreviousSkill go back
+PreviousSkill tell me about the previous skill
+PreviousSkill how about the previous skill
+NextSkill next
+NextSkill next skill
+NextSkill skip
+NextSkill tell me about the next skill
+NextSkill how about the next skill
+DescribeRatings what are the ratings for this skill
+DescribeRatings what is the skill's average rating
+DescribeRatings what is its average rating
+DescribeRatings what is the average rating of the skill
+DescribeRatings how many ratings does the skill have
+DescribeRatings how many ratings does it have
+DescribeRatings how are the skill's ratings
+DescribeRatings how are ratings for the skill
+DescribeRatings what are the ratings like
+DescribeRatings what are the ratings
+DescribeRatings how are the ratings
+DescribeRatings what are the reviews for this skill
+DescribeRatings what is the skill's average review
+DescribeRatings what is its average review
+DescribeRatings what is the average review of the skill
+DescribeRatings how many reviews does the skill have
+DescribeRatings how many reviews does it have
+DescribeRatings how are the skill's reviews
+DescribeRatings how are reviews for the skill
+DescribeRatings what are the reviews like
+DescribeRatings what are the reviews
+DescribeRatings how are the reviews
