@@ -14,18 +14,18 @@ except (IOError, ImportError):
    readme = ''
 
 requirements = [
-    'transitions',
-    'voicelabs'
+    'transitions==0.5.0',
+    'voicelabs==0.0.10'
 ]
 
 test_requirements = [
-    'elasticsearch==5.0.1',
-    'elasticsearch-dsl==5.0.0'
+    'elasticsearch==5.1.0',
+    'elasticsearch-dsl==5.1.0'
 ]
 
 setup(
     name='alexafsm',
-    version='0.1.5',
+    version='0.1.10',
     description="Finite-state machine library for building complex Alexa conversations",
     long_description=readme + '\n\n' + history,
     author="Allen AI",

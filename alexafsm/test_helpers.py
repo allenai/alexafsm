@@ -1,6 +1,7 @@
 import hashlib
 import pickle
 import json
+import inspect
 
 
 def recordable(record_dir_function, is_playback, is_record):
@@ -15,25 +16,35 @@ def recordable(record_dir_function, is_playback, is_record):
     """
 
     def real_decorator(external_resource_function):
-        def cache_filename(kwargs):
-            kwargs_as_str = str(sorted(kwargs.items())).encode('utf8')
-            kwargs_hash = hashlib.md5(kwargs_as_str).hexdigest()
-            return f'{external_resource_function.__name__}_{kwargs_hash}.pickle'
+        def cache_filename(args, kwargs):
+            args_as_str = str(args)
+            kwargs_as_str = str(sorted(kwargs.items()))
+            full_args = f"{args_as_str}{kwargs_as_str}"
+            hashed_args = hashlib.md5(full_args.encode('utf-8')).hexdigest()
+            return f'{external_resource_function.__name__}_{hashed_args}.pickle'
 
-        def wrapper(**kwargs):
-            filename = f'{record_dir_function()}/{cache_filename(kwargs)}'
+        def wrapper(*args, **kwargs):
+            # handle default kwargs where some kwarg may or may not be set with default values
+            fullargspec = inspect.getfullargspec(external_resource_function)
+            arguments, defaults = fullargspec.args, fullargspec.defaults
+            if defaults:
+                default_kwargs = {k: v for k, v in zip(arguments[-len(defaults):], defaults)}
+                full_kwargs = {**default_kwargs, **kwargs}
+            else:
+                full_kwargs = kwargs
+            filename = f'{record_dir_function()}/{cache_filename(args, full_kwargs)}'
             if is_playback():
                 # pickle should already exist, read from disk
                 with open(filename, 'rb') as pickle_file:
                     return pickle.load(pickle_file)
             elif is_record():
                 # pickle doesn't yet exist, cache it
-                result = external_resource_function(**kwargs)
+                result = external_resource_function(*args, **kwargs)
                 with open(filename, 'wb') as pickle_file:
                     pickle.dump(result, pickle_file)
                 return result
             else:
-                return external_resource_function(**kwargs)
+                return external_resource_function(*args, **kwargs)
 
         return wrapper
 
@@ -45,5 +56,6 @@ def get_requests_responses(record_file: str):
     Return the (json) requests and expected responses from previous recordings.
     These are returned in the same order they were recorded in.
     """
-    lines = open(record_file).readlines()
+    with open(record_file) as f:
+        lines = f.readlines()
     return [tuple(json.loads(line)) for line in lines]
