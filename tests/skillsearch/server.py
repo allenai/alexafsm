@@ -13,13 +13,13 @@ from livereload import Server
 from voicelabs.voicelabs import VoiceInsights
 
 from tests.skillsearch.policy import Policy
+from tests.skillsearch.skill_settings import SkillSettings
 
 app = Flask(__name__)
 
 logger = logging.getLogger(__name__)
-es_server = 'es_server.com'
+settings = SkillSettings()
 port = 8888
-vi = None
 
 
 @app.route('/', methods=['POST'])
@@ -28,7 +28,7 @@ def main():
     policy = Policy.get_policy(req['session']['sessionId'])
     # Alternatively, use policy = Policy.initialize() to bypass policy pool
 
-    return json.dumps(policy.handle(req, vi)).encode('utf-8')
+    return json.dumps(policy.handle(req, settings.vi)).encode('utf-8')
 
 
 def _usage():
@@ -49,10 +49,10 @@ if __name__ == '__main__':
             _usage()
             sys.exit()
         if opt in ('-s', '--es-server'):
-            es_server = arg
+            settings.es_server = arg
         if opt in ('-i', '--voice-insight'):
             print("Activating VoiceInsight")
-            vi = VoiceInsights()
+            settings.vi = VoiceInsights()
 
     log_file = f"alexa.log"
     print(f"Logging to {log_file} (append)")
@@ -60,8 +60,8 @@ if __name__ == '__main__':
                         filename=log_file,
                         filemode='a',
                         level=logging.INFO)
-    print(f"Connecting to elasticsearch server on {es_server}")
-    connections.create_connection(hosts=[es_server])  # connect to ES cluster
+    print(f"Connecting to elasticsearch server on {settings.es_server}")
+    connections.create_connection(hosts=[settings.es_server])  # connect to ES cluster
     print(f"Now listening for Alexa requests on port #: {port}")
     server = Server(app.wsgi_app)
     server.serve(host='0.0.0.0', port=port)
