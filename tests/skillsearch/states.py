@@ -2,7 +2,7 @@ from alexafsm.states import with_transitions, States as StatesBase
 from alexafsm import response
 from alexafsm import amazon_intent
 
-from tests.skillsearch.es_skill import Skill
+from tests.skillsearch.skill import Skill
 from tests.skillsearch.intent import NTH_SKILL, PREVIOUS_SKILL, NEXT_SKILL, NEW_SEARCH, \
     DESCRIBE_RATINGS
 from tests.skillsearch.session_attributes import SessionAttributes, ENGLISH_NUMBERS

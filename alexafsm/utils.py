@@ -8,9 +8,7 @@ from alexafsm.session_attributes import INITIAL_STATE
 
 
 def validate(policy: Policy, schema_file: str, ignore_intents: Set[str] = ()):
-    """
-    Check for inconsistencies in policy definition
-    """
+    """Check for inconsistencies in policy definition"""
     schema = {}
     with open(schema_file, mode='r') as f:
         schema = json.loads(f.read())
@@ -89,10 +87,9 @@ def graph(policy_cls, png_file):
 
 
 def get_dialogs(request, response):
-    """
-    Return key information about a conversation turn as stored in a pair of request & response
-    """
+    """Return key information about a conversation turn as stored in a pair of request & response"""
     request_id = request['request']['requestId']
+
     # there are no attributes when starting a new conversation from the alexa device
     session_attributes = request['session'].get('attributes', {})
     from_state = session_attributes.get('state', INITIAL_STATE)
@@ -123,9 +120,7 @@ def events_states_transitions(policy: Policy):
 
 
 def used_events_states_transitions(recorded_requests_responses):
-    """
-    Based on recorded data, compute and return the used events, states, and transitions
-    """
+    """Based on recorded data, compute and return the used events, states, and transitions"""
     used_events = set()
     used_states = set()
     used_transitions = set()
@@ -143,9 +138,8 @@ def used_events_states_transitions(recorded_requests_responses):
 
 
 def unused_events_states_transitions(policy, recorded_requests_responses):
-    """
-    Based on recorded data and a policy, compute and return the unused events, states, and transitions
-    """
+    """Based on recorded data and a policy, compute and return the unused events, states, and
+     transitions"""
     all_events, all_states, all_transitions = events_states_transitions(policy)
     used_events, used_states, used_transitions = used_events_states_transitions(recorded_requests_responses)
     unused_states = all_states - used_states

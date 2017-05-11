@@ -2,10 +2,8 @@ import importlib
 import logging
 import os
 import json
-from abc import abstractmethod
 
 from transitions import MachineError
-from typing import TypeVar, List
 from voicelabs import VoiceInsights
 
 from alexafsm import response
@@ -37,83 +35,42 @@ class Policy:
             initial=states.attributes.state,
             auto_transitions=False
         )
-        self.attributes_backup = self.attributes
 
         for transition in transitions:
             self.machine.add_transition(**transition)
 
-        self.add_extra_transitions()
-
-    @abstractmethod
-    def add_extra_transitions(self):
-        """
-        Add any extra transitions that are not encoded in decorators in States class
-        """
-        pass
-
-    def add_conditional_transition(self,
-                                   trigger: str,
-                                   source: TypeVar('T', str, List),
-                                   prepare: str,
-                                   dest: str) -> None:
-        """
-        Add conditional transition with a condition function following a naming convention
-        """
-        self.machine.add_transition(
-            trigger=trigger,
-            source=source,
-            dest=dest,
-            prepare=prepare,
-            conditions=Policy._condition_function(dest)
-        )
-
-    @staticmethod
-    def _condition_function(dest):
-        return f"m_{dest}"
-
-    @classmethod
-    def initialize(cls, request: dict = None, with_graph: bool = False):
-        """
-        Construct a policy in initial state
-        """
-        states = cls.states_cls.from_request(request=request)
-        return cls(states, request, with_graph)
-
-    def update_with_request(self, request):
-        """
-        Update the session attributes with a request
-        """
-        # backup attributes in case of invalid FSM transition
-        self.attributes_backup = self.attributes
-        self.states.attributes = type(self.states.attributes).from_request(request)
-        self.state = self.attributes.state
-
     @property
     def attributes(self) -> SessionAttributes:
         return self.states.attributes
+
+    @classmethod
+    def initialize(cls, request: dict = None, with_graph: bool = False):
+        """Construct a policy in initial state"""
+        states = cls.states_cls.from_request(request=request)
+        return cls(states, request, with_graph)
 
     def get_current_state_response(self) -> response.Response:
         resp_function = getattr(type(self.states), self.state)
         return resp_function(self.states)
 
     def execute(self) -> response.Response:
-        """
-        Called when the user specifies an intent for this skill
-        """
+        """Called when the user specifies an intent for this skill"""
         intent = self.attributes.intent
         previous_state = self.state
+
+        # backup attributes in case of invalid FSM transition
+        attributes_backup = self.attributes
         try:
             # trigger is added by transitions library
             self.trigger(intent)
             current_state = self.state
-            logger.info(f"Changed states {previous_state} -> {current_state} "
-                        f"through intent {intent}")
+            logger.info(f"Changed from {previous_state} to {current_state} through {intent}")
             self.attributes.state = current_state
             return self.get_current_state_response()
         except MachineError as exception:
             logger.error(str(exception))
             # reset attributes
-            self.states.attributes = self.attributes_backup
+            self.states.attributes = attributes_backup
             return response.NOT_UNDERSTOOD
 
     def handle(self, request: dict, voice_insights: VoiceInsights = None,
@@ -127,7 +84,8 @@ class Policy:
         (req, session) = (request['request'], request['session'])
         logger.info(f"applicationId = {session['application']['applicationId']}")
         request_type = req['type']
-        logger.info(f"{request_type}, requestId: {req['requestId']}, sessionId: {session['sessionId']}")
+        logger.info(
+            f"{request_type}, requestId: {req['requestId']}, sessionId: {session['sessionId']}")
 
         if voice_insights:
             app_token = os.environ['VOICELABS_API_KEY']
@@ -137,7 +95,8 @@ class Policy:
             resp = self.get_current_state_response()
         elif request_type == 'IntentRequest':
             intent = req['intent']
-            self.update_with_request(request)
+            self.states.attributes = type(self.states.attributes).from_request(request)
+            self.state = self.attributes.state
             resp = self.execute()
             resp = resp._replace(session_attributes=self.states.attributes)
             if voice_insights:

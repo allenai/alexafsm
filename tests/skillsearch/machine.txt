@@ -1,83 +1,270 @@
 Machine states:
-	initial, describing, exiting, is_that_all, many_results, no_results, one_result, rephrase_or_refine, search_prompt
+	bad_navigate, describe_ratings, describing, exiting, has_result, helping, initial, is_that_all, no_query_search, no_result, search_prompt
 
 Events and transitions:
 
+Event: NthSkill
+	Source: bad_navigate
+		bad_navigate -> bad_navigate, conditions: ['m_has_nth']
+		bad_navigate -> has_result, conditions: ['m_has_nth']
+	Source: describe_ratings
+		describe_ratings -> bad_navigate, conditions: ['m_has_nth']
+		describe_ratings -> has_result, conditions: ['m_has_nth']
+	Source: describing
+		describing -> bad_navigate, conditions: ['m_has_nth']
+		describing -> has_result, conditions: ['m_has_nth']
+	Source: exiting
+		exiting -> bad_navigate, conditions: ['m_has_nth']
+		exiting -> has_result, conditions: ['m_has_nth']
+	Source: has_result
+		has_result -> bad_navigate, conditions: ['m_has_nth']
+		has_result -> has_result, conditions: ['m_has_nth']
+	Source: helping
+		helping -> bad_navigate, conditions: ['m_has_nth']
+		helping -> has_result, conditions: ['m_has_nth']
+	Source: initial
+		initial -> bad_navigate, conditions: ['m_has_nth']
+		initial -> has_result, conditions: ['m_has_nth']
+	Source: is_that_all
+		is_that_all -> bad_navigate, conditions: ['m_has_nth']
+		is_that_all -> has_result, conditions: ['m_has_nth']
+	Source: no_query_search
+		no_query_search -> bad_navigate, conditions: ['m_has_nth']
+		no_query_search -> has_result, conditions: ['m_has_nth']
+	Source: no_result
+		no_result -> bad_navigate, conditions: ['m_has_nth']
+		no_result -> has_result, conditions: ['m_has_nth']
+	Source: search_prompt
+		search_prompt -> bad_navigate, conditions: ['m_has_nth']
+		search_prompt -> has_result, conditions: ['m_has_nth']
+Event: PreviousSkill
+	Source: bad_navigate
+		bad_navigate -> bad_navigate, conditions: ['m_has_previous']
+		bad_navigate -> has_result, conditions: ['m_has_previous']
+	Source: describe_ratings
+		describe_ratings -> bad_navigate, conditions: ['m_has_previous']
+		describe_ratings -> has_result, conditions: ['m_has_previous']
+	Source: describing
+		describing -> bad_navigate, conditions: ['m_has_previous']
+		describing -> has_result, conditions: ['m_has_previous']
+	Source: exiting
+		exiting -> bad_navigate, conditions: ['m_has_previous']
+		exiting -> has_result, conditions: ['m_has_previous']
+	Source: has_result
+		has_result -> bad_navigate, conditions: ['m_has_previous']
+		has_result -> has_result, conditions: ['m_has_previous']
+	Source: helping
+		helping -> bad_navigate, conditions: ['m_has_previous']
+		helping -> has_result, conditions: ['m_has_previous']
+	Source: initial
+		initial -> bad_navigate, conditions: ['m_has_previous']
+		initial -> has_result, conditions: ['m_has_previous']
+	Source: is_that_all
+		is_that_all -> bad_navigate, conditions: ['m_has_previous']
+		is_that_all -> has_result, conditions: ['m_has_previous']
+	Source: no_query_search
+		no_query_search -> bad_navigate, conditions: ['m_has_previous']
+		no_query_search -> has_result, conditions: ['m_has_previous']
+	Source: no_result
+		no_result -> bad_navigate, conditions: ['m_has_previous']
+		no_result -> has_result, conditions: ['m_has_previous']
+	Source: search_prompt
+		search_prompt -> bad_navigate, conditions: ['m_has_previous']
+		search_prompt -> has_result, conditions: ['m_has_previous']
+Event: NextSkill
+	Source: bad_navigate
+		bad_navigate -> bad_navigate, conditions: ['m_has_next']
+		bad_navigate -> has_result, conditions: ['m_has_next']
+	Source: describe_ratings
+		describe_ratings -> bad_navigate, conditions: ['m_has_next']
+		describe_ratings -> has_result, conditions: ['m_has_next']
+	Source: describing
+		describing -> bad_navigate, conditions: ['m_has_next']
+		describing -> has_result, conditions: ['m_has_next']
+	Source: exiting
+		exiting -> bad_navigate, conditions: ['m_has_next']
+		exiting -> has_result, conditions: ['m_has_next']
+	Source: has_result
+		has_result -> bad_navigate, conditions: ['m_has_next']
+		has_result -> has_result, conditions: ['m_has_next']
+	Source: helping
+		helping -> bad_navigate, conditions: ['m_has_next']
+		helping -> has_result, conditions: ['m_has_next']
+	Source: initial
+		initial -> bad_navigate, conditions: ['m_has_next']
+		initial -> has_result, conditions: ['m_has_next']
+	Source: is_that_all
+		is_that_all -> bad_navigate, conditions: ['m_has_next']
+		is_that_all -> has_result, conditions: ['m_has_next']
+	Source: no_query_search
+		no_query_search -> bad_navigate, conditions: ['m_has_next']
+		no_query_search -> has_result, conditions: ['m_has_next']
+	Source: no_result
+		no_result -> bad_navigate, conditions: ['m_has_next']
+		no_result -> has_result, conditions: ['m_has_next']
+	Source: search_prompt
+		search_prompt -> bad_navigate, conditions: ['m_has_next']
+		search_prompt -> has_result, conditions: ['m_has_next']
+Event: AMAZON.NoIntent
+	Source: has_result
+		has_result -> bad_navigate, conditions: ['m_has_next']
+		has_result -> has_result, conditions: ['m_has_next']
+	Source: describe_ratings
+		describe_ratings -> is_that_all
+	Source: describing
+		describing -> search_prompt
+	Source: is_that_all
+		is_that_all -> search_prompt
+Event: DescribeRatings
+	Source: bad_navigate
+		bad_navigate -> describe_ratings, conditions: ['m_has_result']
+	Source: describe_ratings
+		describe_ratings -> describe_ratings, conditions: ['m_has_result']
+	Source: describing
+		describing -> describe_ratings, conditions: ['m_has_result']
+	Source: exiting
+		exiting -> describe_ratings, conditions: ['m_has_result']
+	Source: has_result
+		has_result -> describe_ratings, conditions: ['m_has_result']
+	Source: helping
+		helping -> describe_ratings, conditions: ['m_has_result']
+	Source: initial
+		initial -> describe_ratings, conditions: ['m_has_result']
+	Source: is_that_all
+		is_that_all -> describe_ratings, conditions: ['m_has_result']
+	Source: no_query_search
+		no_query_search -> describe_ratings, conditions: ['m_has_result']
+	Source: no_result
+		no_result -> describe_ratings, conditions: ['m_has_result']
+	Source: search_prompt
+		search_prompt -> describe_ratings, conditions: ['m_has_result']
 Event: AMAZON.YesIntent
-	Source: one_result
-		one_result -> describing, prepare: ['m_retrieve_skill_with_id']
-	Source: many_results
-		many_results -> describing, prepare: ['m_retrieve_skill_with_id']
+	Source: has_result
+		has_result -> describing
+	Source: describe_ratings
+		describe_ratings -> describing
 	Source: describing
 		describing -> exiting
 	Source: is_that_all
 		is_that_all -> exiting
 Event: AMAZON.CancelIntent
-	Source: initial
-		initial -> exiting
-	Source: describing
-		describing -> exiting
-		describing -> is_that_all
-	Source: exiting
-		exiting -> exiting
-	Source: is_that_all
-		is_that_all -> exiting
-	Source: many_results
-		many_results -> exiting
-	Source: no_results
-		no_results -> exiting
-	Source: one_result
-		one_result -> exiting
-	Source: rephrase_or_refine
-		rephrase_or_refine -> exiting
+	Source: no_result
+		no_result -> exiting
 	Source: search_prompt
 		search_prompt -> exiting
-Event: AMAZON.NoIntent
-	Source: one_result
-		one_result -> is_that_all
-	Source: many_results
-		many_results -> rephrase_or_refine
-	Source: describing
-		describing -> search_prompt
 	Source: is_that_all
-		is_that_all -> search_prompt
-Event: AMAZON.StopIntent
+		is_that_all -> exiting
+	Source: bad_navigate
+		bad_navigate -> exiting
+	Source: no_query_search
+		no_query_search -> exiting
 	Source: describing
 		describing -> is_that_all
-Event: Search
+	Source: has_result
+		has_result -> is_that_all
+	Source: describe_ratings
+		describe_ratings -> is_that_all
 	Source: initial
-		initial -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		initial -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		initial -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: describing
-		describing -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		describing -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		describing -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: exiting
-		exiting -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		exiting -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		exiting -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: is_that_all
-		is_that_all -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		is_that_all -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		is_that_all -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: many_results
-		many_results -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		many_results -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		many_results -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: no_results
-		no_results -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		no_results -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		no_results -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: one_result
-		one_result -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		one_result -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		one_result -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
-	Source: rephrase_or_refine
-		rephrase_or_refine -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		rephrase_or_refine -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		rephrase_or_refine -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+		initial -> search_prompt
+	Source: helping
+		helping -> search_prompt
+Event: AMAZON.StopIntent
+	Source: no_result
+		no_result -> exiting
 	Source: search_prompt
-		search_prompt -> no_results, prepare: ['m_search'], conditions: ['m_no_results']
-		search_prompt -> one_result, prepare: ['m_search'], conditions: ['m_one_result']
-		search_prompt -> many_results, prepare: ['m_search'], conditions: ['m_many_results']
+		search_prompt -> exiting
+	Source: is_that_all
+		is_that_all -> exiting
+	Source: bad_navigate
+		bad_navigate -> exiting
+	Source: no_query_search
+		no_query_search -> exiting
+	Source: describing
+		describing -> is_that_all
+	Source: has_result
+		has_result -> is_that_all
+	Source: describe_ratings
+		describe_ratings -> is_that_all
+	Source: initial
+		initial -> search_prompt
+	Source: helping
+		helping -> search_prompt
+Event: NewSearch
+	Source: bad_navigate
+		bad_navigate -> exiting, conditions: ['m_searching_for_exit']
+		bad_navigate -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		bad_navigate -> no_query_search, conditions: ['m_no_query_search']
+		bad_navigate -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: describe_ratings
+		describe_ratings -> exiting, conditions: ['m_searching_for_exit']
+		describe_ratings -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		describe_ratings -> no_query_search, conditions: ['m_no_query_search']
+		describe_ratings -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: describing
+		describing -> exiting, conditions: ['m_searching_for_exit']
+		describing -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		describing -> no_query_search, conditions: ['m_no_query_search']
+		describing -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: exiting
+		exiting -> exiting, conditions: ['m_searching_for_exit']
+		exiting -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		exiting -> no_query_search, conditions: ['m_no_query_search']
+		exiting -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: has_result
+		has_result -> exiting, conditions: ['m_searching_for_exit']
+		has_result -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		has_result -> no_query_search, conditions: ['m_no_query_search']
+		has_result -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: helping
+		helping -> exiting, conditions: ['m_searching_for_exit']
+		helping -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		helping -> no_query_search, conditions: ['m_no_query_search']
+		helping -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: initial
+		initial -> exiting, conditions: ['m_searching_for_exit']
+		initial -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		initial -> no_query_search, conditions: ['m_no_query_search']
+		initial -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: is_that_all
+		is_that_all -> exiting, conditions: ['m_searching_for_exit']
+		is_that_all -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		is_that_all -> no_query_search, conditions: ['m_no_query_search']
+		is_that_all -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: no_query_search
+		no_query_search -> exiting, conditions: ['m_searching_for_exit']
+		no_query_search -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		no_query_search -> no_query_search, conditions: ['m_no_query_search']
+		no_query_search -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: no_result
+		no_result -> exiting, conditions: ['m_searching_for_exit']
+		no_result -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		no_result -> no_query_search, conditions: ['m_no_query_search']
+		no_result -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+	Source: search_prompt
+		search_prompt -> exiting, conditions: ['m_searching_for_exit']
+		search_prompt -> has_result, prepare: ['m_search'], conditions: ['m_has_result_and_query']
+		search_prompt -> no_query_search, conditions: ['m_no_query_search']
+		search_prompt -> no_result, prepare: ['m_search'], conditions: ['m_no_result']
+Event: AMAZON.HelpIntent
+	Source: bad_navigate
+		bad_navigate -> helping
+	Source: describe_ratings
+		describe_ratings -> helping
+	Source: describing
+		describing -> helping
+	Source: exiting
+		exiting -> helping
+	Source: has_result
+		has_result -> helping
+	Source: helping
+		helping -> helping
+	Source: initial
+		initial -> helping
+	Source: is_that_all
+		is_that_all -> helping
+	Source: no_query_search
+		no_query_search -> helping
+	Source: no_result
+		no_result -> helping
+	Source: search_prompt
+		search_prompt -> helping
