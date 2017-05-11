@@ -25,7 +25,6 @@ class Policy(PolicyBase):
         if not self.attributes.slots.query:
             return False
 
-        # preprocessing of slots
         current_query = self.attributes.slots.query
         if current_query == 'find':
             self.states.attributes.slots = self.states.attributes.slots._replace(query='')
@@ -62,8 +61,8 @@ class Policy(PolicyBase):
         attributes.first_time_presenting_results = True
 
     def m_no_query_search(self) -> bool:
-        # Amazon sent us a search intent without a query
-        # or maybe the user said "I want to find ..." and took too long to finish
+        """Amazon sent us a search intent without a query
+        or maybe the user said "I want to find ..." and took too long to finish"""
         return not self.attributes.slots.query or self.attributes.slots.query == 'find'
 
     def m_no_result(self) -> bool:
@@ -84,8 +83,8 @@ class Policy(PolicyBase):
         self.attributes.skill_cursor = self.attributes.nth_as_index
         self.attributes.first_time_presenting_results = False
 
-    # Go to next skill
     def m_set_next(self) -> None:
+        """Go to next skill"""
         self.attributes.skill_cursor += 1
         self.attributes.first_time_presenting_results = False
 
@@ -93,8 +92,8 @@ class Policy(PolicyBase):
         return self.m_has_result() and \
             self.attributes.skill_cursor + 1 < len(self.attributes.skills)
 
-    # Go to previous skill
     def m_set_previous(self) -> None:
+        """Go to previous skill"""
         self.attributes.skill_cursor -= 1
         self.attributes.first_time_presenting_results = False
 

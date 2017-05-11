@@ -1,6 +1,4 @@
-"""
-Get information from Dynamo DB
-"""
+"""Interface to DynamoDB"""
 
 import boto3
 
@@ -19,11 +17,7 @@ class DynamoDB:
         })
 
     def get_user_info(self, user_id: str) -> dict:
-        response = DynamoDB.table.get_item(Key={'userId': user_id})
-        if 'Item' in response:
-            return response['Item']
-        else:  # item doesn't yet exist
-            return None
+        return DynamoDB.table.get_item(Key={'userId': user_id}).get('Item')
 
     def set_user_info(self, user_id: str, **kwargs):
         DynamoDB.table.update_item(
