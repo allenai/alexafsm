@@ -1,7 +1,3 @@
-"""
-Representation of response returned to user
-"""
-
 from collections import namedtuple
 
 from alexafsm.session_attributes import SessionAttributes
@@ -9,9 +5,7 @@ from alexafsm.session_attributes import SessionAttributes
 
 class Response(namedtuple('Response', ['speech', 'card', 'card_content', 'reprompt', 'should_end',
                                        'image', 'session_attributes'])):
-    """
-    Pythonic representation of the response to be sent to Alexa
-    """
+    """Pythonic representation of the response to be sent to Alexa"""
     def __new__(cls, speech: str, reprompt: str, card: str = None, should_end: bool = False,
                 card_content: str = None, image: str = None,
                 session_attributes: SessionAttributes = SessionAttributes()):
@@ -23,9 +17,7 @@ class Response(namedtuple('Response', ['speech', 'card', 'card_content', 'reprom
                      session_attributes=session_attributes)
 
     def to_json(self):
-        """
-        Build entire Alexa response as a JSON-serializable dictionary
-        """
+        """Build entire Alexa response as a JSON-serializable dictionary"""
         card = None
 
         if self.card:

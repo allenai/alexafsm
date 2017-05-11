@@ -1,6 +1,4 @@
-"""
-Handle query to elasticsearch
-"""
+"""Client that handles query to elasticsearch"""
 
 import string
 from typing import List
@@ -11,7 +9,7 @@ from alexafsm.test_helpers import recordable as rec
 from elasticsearch_dsl.response import Response
 
 from tests.skillsearch.skill_settings import SkillSettings
-from tests.skillsearch.es_skill import Skill, INDEX
+from tests.skillsearch.skill import Skill, INDEX
 from tests.skillsearch.dynamodb import DynamoDB
 
 es_search: Search = Search(index=INDEX).source(excludes=['html'])
@@ -20,8 +18,7 @@ es_search: Search = Search(index=INDEX).source(excludes=['html'])
 def get_es_skills(query: str, top_n: int, category: str = None, keyphrase: str = None) -> (int, List[Skill]):
     """Return the total number of hits and the top_n skills"""
     result = get_es_results(query, category, keyphrase).to_dict()
-    hits = result['hits']['hits']
-    return result['hits']['total'], [Skill.from_es(h) for h in hits[:top_n]]
+    return result['hits']['total'], [Skill.from_es(h) for h in result['hits']['hits'][:top_n]]
 
 
 def recordable(func):
@@ -72,10 +69,8 @@ def _get_es_results(query: str, category: str, keyphrase: str, strict: bool) -> 
 
 @recordable
 def get_user_info(user_id: str, request_id: str) -> dict:  # NOQA
-    """
-    Get information of user with user_id from dynamodb. request_id is simply there so that we can
-    record different responses from dynamodb for the same user during playback
-    """
+    """Get information of user with user_id from dynamodb. request_id is simply there so that we can
+    record different responses from dynamodb for the same user during playback"""
     return DynamoDB().get_user_info(user_id)
 
 

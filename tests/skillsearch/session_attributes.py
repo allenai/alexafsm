@@ -3,7 +3,7 @@ from typing import List
 
 from alexafsm.session_attributes import SessionAttributes as SessionAttributesBase, INITIAL_STATE
 
-from tests.skillsearch.es_skill import Skill
+from tests.skillsearch.skill import Skill
 
 Slots = namedtuple('Slots', ['query', 'nth'])
 NUMBER_SUFFIXES = {'st', 'nd', 'rd', 'th'}
@@ -43,9 +43,7 @@ class SessionAttributes(SessionAttributesBase):
 
     @property
     def nth_as_index(self):
-        """
-        Return -1 if we cannot figure out what index was actually meant by the user
-        """
+        """Return -1 if we cannot figure out what index was actually meant by the user"""
         if not self.slots.nth:  # Amazon's intent system might not give us anything
             return -1
         elif self.slots.nth in ENGLISH_NUMBERS:

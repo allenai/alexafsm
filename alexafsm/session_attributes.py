@@ -2,9 +2,7 @@ INITIAL_STATE = 'initial'
 
 
 class SessionAttributes:
-    """
-    Base class for all session attributes that keep track of the state of conversation
-    """
+    """Base class for all session attributes that keep track of the state of conversation"""
 
     # "Abstract" class properties to be overridden/set in inherited classes
     # Inherited classes should override this like so:
@@ -23,9 +21,7 @@ class SessionAttributes:
 
     @classmethod
     def from_request(cls, request: dict) -> 'SessionAttributes':
-        """
-        Construct session attributes object from request
-        """
+        """Construct session attributes object from request"""
         slots_cls = cls.slots_cls
         none_slots = _slots_from_dict(slots_cls, slots=None)
         if not request:

@@ -1,14 +1,8 @@
-"""
-Settings for Alexa skills app
-"""
-
-import importlib
+"""Settings for Alexa skills app"""
 
 
 class SkillSettings:
-    """
-    Singleton settings for app
-    """
+    """Singleton settings for app"""
     settings = None
 
     class SkillSettingsImpl:
@@ -22,20 +16,12 @@ class SkillSettings:
         playback = False
 
         def get_record_dir(self):
-            """
-            Get the file where replays should be saved
-            """
-            return f'src/test/resources/playback/skillsearch'
+            """Get the directory where replays should be saved"""
+            return f'tests/skillsearch/playback'
 
         def get_record_file(self):
-            """
-            Get the file where replays should be saved
-            """
+            """Get the file where replays should be saved"""
             return f'{self.get_record_dir()}/recordings.json'
-
-        def get_policy(self, request: dict = None):
-            policy_module = importlib.import_module(f"tests.skillsearch.policy")
-            return policy_module.Policy.initialize(request)
 
     def __init__(self):
         if not SkillSettings.settings:

@@ -1,6 +1,4 @@
-"""
-This demonstrates a Flask server that uses alexafsm-based skill search
-"""
+"""This demonstrates a Flask server that uses alexafsm-based skill search"""
 
 import getopt
 import json
@@ -25,15 +23,13 @@ port = 8888
 @app.route('/', methods=['POST'])
 def main():
     req = flask_request.json
-    policy = Policy.get_policy(req['session']['sessionId'])
-    # Alternatively, use policy = Policy.initialize() to bypass policy pool
-
+    policy = Policy.initialize()
     return json.dumps(policy.handle(req, settings.vi)).encode('utf-8')
 
 
 def _usage():
     print(f"Usage: alexa-listener.py"
-          f" -s --es-server <ES cluster address [es_server.com]>"
+          f" -s --es-server <ES cluster address [your.es_server]>"
           f" -i --use-voice-insight <use-voice-insight? (y/[N])>")
 
 
@@ -61,7 +57,7 @@ if __name__ == '__main__':
                         filemode='a',
                         level=logging.INFO)
     print(f"Connecting to elasticsearch server on {settings.es_server}")
-    connections.create_connection(hosts=[settings.es_server])  # connect to ES cluster
+    connections.create_connection(hosts=[settings.es_server])
     print(f"Now listening for Alexa requests on port #: {port}")
     server = Server(app.wsgi_app)
     server.serve(host='0.0.0.0', port=port)
