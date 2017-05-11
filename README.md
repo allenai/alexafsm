@@ -13,6 +13,8 @@ using this library can model dialog agents with first-class concepts such as
 states, attributes, transition, and actions. Visualization and other tools are
 also provided to help understand and debug complex FSM conversations.
 
+Also check out our [blog post](https://medium.com/@vha14/alexafsm-a-finite-state-machine-python-library-for-building-complex-alexa-skills-61c3af5a299d).
+
 ## Features
 
 * FSM-based library for building Alexa skills with complex dialog state tracking.
