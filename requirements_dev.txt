@@ -1,6 +1,6 @@
 elasticsearch==5.1.0
 elasticsearch-dsl==5.1.0
-flask==0.12
+flask==1.0
 livereload==2.5.1
 transitions==0.5.0
 voicelabs==0.0.10
